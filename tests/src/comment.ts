@@ -164,6 +164,8 @@ test("comments zome: create and retrieve comments", async (t) => {
           comment: "me too",
         },
       });
+
+      await pause(1000);
       
       let bobComments: Array<any> = await alice.cells[0].callZome({
         zome_name: "comments",
