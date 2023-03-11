@@ -132,6 +132,50 @@ test("comments zome: create and retrieve comments", async (t) => {
         0,
         "get_comments_on should not return any comments after the comment is deleted"
       );
+
+      if (isExercise && stepNum === 4) return;
+
+      await pause(1000);
+
+      let newCommentHash = await bob.cells[0].callZome({
+        zome_name: "comments",
+        fn_name: "create_comment",
+        payload: {
+          comment_on: postHash,
+          comment: "Oh yes I like it!",
+        },
+      });
+      
+
+      newCommentHash = await bob.cells[0].callZome({
+        zome_name: "comments",
+        fn_name: "create_comment",
+        payload: {
+          comment_on: newCommentHash,
+          comment: "Oh yes I do",
+        },
+      });
+
+      newCommentHash = await alice.cells[0].callZome({
+        zome_name: "comments",
+        fn_name: "create_comment",
+        payload: {
+          comment_on: postHash,
+          comment: "me too",
+        },
+      });
+      
+      let bobComments: Array<any> = await alice.cells[0].callZome({
+        zome_name: "comments",
+        fn_name: "get_all_comments_for_agent",
+        payload: bob.agentPubKey,
+      });
+      t.equal(
+        bobComments.length,
+        2,
+        "get_all_comments_for_agent should get only return comments for that agent"
+      );
+      
     });
   } catch (e) {
     console.log(e);
